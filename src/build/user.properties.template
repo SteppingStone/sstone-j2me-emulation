@@ -1,0 +1,37 @@
+#
+#       Copy this file to a file named user.properties in this directory.
+#       Configure the keystore settings in user.properties so you can
+#       sign j2me apps. DO NOT CHECK user.properties into revision control
+#       
+#       You MUST also configure wtk.home.sun to point to the installed location
+#       of your SUN/Oracle J2ME 2.5.2 WTK. This directory should contain the
+#       lib and wtklib subdirs
+#
+emulator=sun
+wtk.home.sun=${user.home}/opt/j2me/sun/WTK2.5.2
+wtk.home.samsung=
+wtk.home.nokias40=
+
+### Set antenna.jar if you want to use a custom version of antenna
+# antenna.jar=${user.home}/opt/javalib/antenna/antenna-bin-1.2.1-beta.jar
+
+# Configure keystore.dir to the location of your java keystore files
+keystore.dir=/path/to/your/keystore/dir
+
+# vendor is the CNAME of your key
+vendor=Education Development Center, Inc.
+
+# keystore.file is the actual jks file
+keystore.file=${keystore.dir}/edc.jks
+
+### The password (storepass) for the java keystore
+keystore.pass=YOUR_KEYSTORE_PASS
+
+### The alias of the key inside the jks
+code_signing_cert.alias=edc
+
+### The password for the code signing cert's private key
+code_signing_key.pass=YOUR_KEYPASS
+
+#log.level=DEBUG
+log.level=INFO

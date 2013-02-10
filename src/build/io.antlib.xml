@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<antlib>
+
+    <scriptdef name="linkOrCopy" language="javascript">
+      <attribute name="file"/>
+      <attribute name="tofile"/>
+      <![CDATA[
+        var System = Packages.java.lang.System;
+        var File = Packages.java.io.File;
+        var FileUtils = Packages.org.apache.tools.ant.util.FileUtils;
+
+        var fileParam = attributes.get("file");
+        var toFileParam = attributes.get("tofile");
+
+        function copy(file, toFile) {
+          FileUtils.getFileUtils().copyFile(file, toFile);
+        }
+
+        function link(file, toFile) {
+          var f_toFile = new File(toFile);
+          var destDir = f_toFile.getParentFile();
+          var toFileBasename = f_toFile.getName();
+
+          if(! FileUtils.getFileUtils().isSymbolicLink(destDir, toFileBasename) ) {
+            var ln = project.createTask("symlink");
+            ln.setAction("single");
+            ln.setOverwrite(false);
+            ln.setLink(toFile);
+            ln.setResource(file);
+            ln.perform();
+          }
+        }
+
+        var osName = System.getProperty("os.name").toLowerCase();
+        if(osName.indexOf("win") == 0) {
+          copy(fileParam, toFileParam);
+        } else {
+          link(fileParam, toFileParam);
+        }
+
+      ]]>
+    </scriptdef>
+
+    <scriptdef name="linkOrCopyFiles" language="javascript">
+      <attribute name="fileset"/>
+      <attribute name="todir"/>
+      <![CDATA[
+        var System = Packages.java.lang.System;
+        var File = Packages.java.io.File;
+        var FileUtils = Packages.org.apache.tools.ant.util.FileUtils;
+
+        var fsName = attributes.get("fileset");
+
+        var fileset = project.getReference(fsName);
+        var todir = attributes.get("todir");
+        var destDir = new File(todir);
+
+        var fsDir = fileset.getDir();
+
+        var ds = fileset.getDirectoryScanner(project);
+        var srcFiles = ds.getIncludedFiles();
+
+        function copy(file, toFile) {
+          FileUtils.getFileUtils().copyFile(file, toFile);
+        }
+
+        function link(file, toFile) {
+          var f_toFile = new File(toFile);
+          var destDir = f_toFile.getParentFile();
+          var toFileBasename = f_toFile.getName();
+
+          if(! FileUtils.getFileUtils().isSymbolicLink(destDir, toFileBasename) ) {
+            var ln = project.createTask("symlink");
+            ln.setAction("single");
+            ln.setOverwrite(false);
+            ln.setLink(toFile);
+            ln.setResource(file);
+            ln.perform();
+          }
+        }
+
+        function linkOrCopy(src, dest) {
+          var osName = System.getProperty("os.name").toLowerCase();
+          if(osName.indexOf("win") == 0) {
+            copy(src, dest);
+          } else {
+            link(src, dest);
+          }
+        }
+
+        var i;
+        for(i=0; i<srcFiles.length; i++) {
+          var f = new File(fsDir, srcFiles[i]);
+
+          var destPath = new File(destDir, f.getName()).getAbsolutePath();
+          var sourcePath = f.getAbsolutePath();
+
+          linkOrCopy(sourcePath, destPath);
+
+          // System.out.println(f.getName());
+        }
+      ]]>
+    </scriptdef>
+
+
+</antlib>
